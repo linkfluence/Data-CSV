@@ -66,7 +66,7 @@ sub new {
 sub def {
 	my $self = shift;
 	$self->set_def(@_) if @_;
-	$self->get_def if wantarray;
+	$self->get_def if defined wantarray;
 }
 
 sub all {
