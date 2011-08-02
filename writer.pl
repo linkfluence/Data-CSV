@@ -1,4 +1,3 @@
-use ina;
 use strict;
 use warnings;
 use Data::CSV::Writer;
@@ -23,7 +22,6 @@ $writer->def(
 );
 
 print 'nodedef>', $writer->def;
-
 print $writer->row({
 	a		=> '0',
 	test	=> {
