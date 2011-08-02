@@ -8,7 +8,8 @@ use enum::fields::extending 'Data::CSV::base';
 sub row {
 	my ($self, $line) = @_;
 	
-	croak "no column definition" unless $self->[DEF];
+	#croak "no column definition" unless $self->[DEF];
+	return $self->def($line) unless $self->[DEF];
 
 	my @row = $self->[CSV]->parse($line) && $self->[CSV]->fields;
 
@@ -58,7 +59,8 @@ sub get_def {
 }
 
 sub set_def {
-	my ($self, $line) = @_;
+	my $self = shift;
+	my $line = shift || croak "missing definition";
 	my @row = $self->[CSV]->parse($line) && $self->[CSV]->fields or croak "unable to parse column definition";
 	$self->[DEF] = [ map { /:/ ? [split(':', $_)] : $_ } @row ];
 	for (@{$self->[DEF]}) {

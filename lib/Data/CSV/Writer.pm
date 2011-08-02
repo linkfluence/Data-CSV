@@ -9,7 +9,10 @@ use List::Pairwise qw(mapp);
 sub row {
 	my ($self, $hash) = @_;
 	
-	croak "no column definition" unless $self->[DEF];
+	#croak "no column definition" unless $self->[DEF];
+	return $self->def($hash) unless $self->[DEF];
+	
+	$hash = {@$hash} if ref($hash) eq 'ARRAY';
 	
 	my $h;
 	my @row = map {
@@ -49,6 +52,7 @@ sub get_def {
 
 sub set_def {
 	my $self = shift;
+	croak "missing definition" unless @_;
 	my $def = (@_==1 && ref $_[0]) ? $_[0] : \@_;
 	
 	$self->[DEF] = [];

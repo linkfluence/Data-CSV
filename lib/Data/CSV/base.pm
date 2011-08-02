@@ -69,6 +69,12 @@ sub def {
 	$self->get_def if wantarray;
 }
 
+sub all {
+	my $self = shift;
+	delete $self->[DEF];
+	map {$self->row($_)} @_
+}
+
 sub text_csv {
 	$_[0]->[CSV]
 }
