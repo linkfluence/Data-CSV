@@ -65,8 +65,8 @@ $writer = Data::CSV->writer(
 	check_type	=> 1,
 );
 
-# direct call
+# direct write all
 #
 # use Data::CSV;
-# print Data::CSV->write(...);
+# print Data::CSV::write(...);
 

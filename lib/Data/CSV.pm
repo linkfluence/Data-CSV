@@ -15,15 +15,11 @@ sub writer {
 }
 
 sub read {
-	require Data::CSV::Reader;
-	shift;
-	Data::CSV::Reader->new->all(@_)
+	reader->all(@_)
 }
 
 sub write {
-	require Data::CSV::Writer;
-	shift;
-	Data::CSV::Writer->new->all(@_)
+	writer->all(@_)
 }
 
 1

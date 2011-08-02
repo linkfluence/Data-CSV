@@ -27,8 +27,8 @@ print Dump $reader->all(
 use Data::CSV;
 $reader = Data::CSV->reader;
 
-# direct call
+# direct read all
 #
 # use Data::CSV;
-# print Dump Data::CSV->read(...);
+# print Dump Data::CSV::read(...);
 
