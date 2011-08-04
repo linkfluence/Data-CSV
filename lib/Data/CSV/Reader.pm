@@ -11,10 +11,11 @@ sub liner {
 	binmode $fh;
 	delete $self->[TYPE];
 	delete $self->[DEF];
-	sub {
+	sub {{
 		my $line = <$fh> || return;
+		redo unless $line =~ /\S/;
 		$self->row($line)
-	}
+	}}
 }
 
 sub row {
