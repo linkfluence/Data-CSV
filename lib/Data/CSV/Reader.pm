@@ -55,19 +55,20 @@ sub get_def {
 	
 	croak "no column definition" unless $self->[DEF];
 	
-	my $hash;
+	my $array;
 	
 	for (@{$self->[DEF]}) {
 		if (ref) {
 			my $h = $self->[DEF_TYPE]->{(ref) ? "@$_" : $_};
 			$h = {$_ => $h} for reverse @$_[1..$#$_];
-			$hash->{$_->[0]} = $h
-		} else {
-			$hash->{$_} = $self->[DEF_TYPE]->{(ref) ? "@$_" : $_}
+			push @$array, $_->[0], $h
+		}
+		else {
+			push @$array, $_, $self->[DEF_TYPE]->{(ref) ? "@$_" : $_}
 		}
 	}
 	
-	$self->[TYPE] ? { $self->[TYPE] => $hash } : $hash
+	$self->[TYPE] ? { $self->[TYPE] => $array } : $array
 }
 
 sub set_def {
