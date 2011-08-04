@@ -10,21 +10,23 @@ my $writer = Data::CSV::Writer->new(
 );
 
 $writer->def(
-	a		=> 'INTEGER',
-	b		=> undef,
-	test	=> [
-		# array => preserve order
-		b	=> undef,
-		a	=> 'VARCHAR',
-	],
-	test2	=> {
-		# hash => order is lost
-		a	=> undef,
-		b	=> 'VARCHAR',
-	},
+	node => [
+		a		=> 'INTEGER',
+		b		=> undef,
+		test	=> [
+			# array => preserve order
+			b	=> undef,
+			a	=> 'VARCHAR',
+		],
+		test2	=> {
+			# hash => order is lost
+			a	=> undef,
+			b	=> 'VARCHAR',
+		},
+	]
 );
 
-print 'nodedef>', $writer->def;
+print $writer->def;
 print $writer->row({
 	a		=> '0',
 	test	=> {
@@ -32,11 +34,13 @@ print $writer->row({
 	},
 });
 
+print "\n\n";
+
 # write all
 
 print $writer->all(
 	 # first entry must be the definition
-	[
+	node => [
 		a		=> 'INTEGER',
 		b		=> undef,
 		test	=> [

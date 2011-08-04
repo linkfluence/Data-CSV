@@ -5,6 +5,18 @@ use Carp;
 use base 'Data::CSV::base';
 use enum::fields::extending 'Data::CSV::base';
 
+sub liner {
+	my ($self, $file) = @_;
+	open(my $fh, '<', $file) or croak "failed to open file '$file' for reading: $!";
+	binmode $fh;
+	delete $self->[TYPE];
+	delete $self->[DEF];
+	sub {
+		my $line = <$fh> || return;
+		$self->row($line)
+	}
+}
+
 sub row {
 	my ($self, $line) = @_;
 	
@@ -55,12 +67,16 @@ sub get_def {
 		}
 	}
 	
-	$hash
+	$self->[TYPE] ? { $self->[TYPE] => $hash } : $hash
 }
 
 sub set_def {
 	my $self = shift;
 	my $line = shift || croak "missing definition";
+	
+	$line =~ s/^(\w+?)def>\s*//;
+	$self->[TYPE] = $1;
+	
 	my @row = $self->[CSV]->parse($line) && $self->[CSV]->fields or croak "unable to parse column definition";
 	$self->[DEF] = [ map { /:/ ? [split(':', $_)] : $_ } @row ];
 	for (@{$self->[DEF]}) {

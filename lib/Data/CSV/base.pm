@@ -8,6 +8,7 @@ use enum::fields qw(
 	DEF_TYPE
 	CHECK_TYPE
 	CSV
+	TYPE
 );
 
 use constant DEFAULT_TEXT_CSV_ARGS	=> (
@@ -71,6 +72,7 @@ sub def {
 
 sub all {
 	my $self = shift;
+	delete $self->[TYPE];
 	delete $self->[DEF];
 	map {$self->row($_)} @_
 }

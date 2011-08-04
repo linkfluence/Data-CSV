@@ -6,6 +6,17 @@ use base 'Data::CSV::base';
 use enum::fields::extending 'Data::CSV::base';
 use List::Pairwise qw(mapp);
 
+sub liner {
+	my ($self, $file) = @_;
+	open(my $fh, '>', $file) or croak "failed to open file '$file' for writing: $!";
+	binmode $fh;
+	delete $self->[TYPE];
+	delete $self->[DEF];
+	sub {
+		print $fh $self->row(shift)
+	}
+}
+
 sub row {
 	my ($self, $hash) = @_;
 	
@@ -38,6 +49,15 @@ sub row {
 	$self->[CSV]->combine(@row) && $self->[CSV]->string
 }
 
+sub all {
+	my $self = shift;
+	delete $self->[TYPE];
+	delete $self->[DEF];
+	return unless @_;
+	(ref($_[0]) ? () : $self->def(splice(@_, 0, 2))), map {$self->row($_)} @_
+	
+}
+
 sub get_def {
 	my $self = shift;
 	
@@ -47,14 +67,19 @@ sub get_def {
 		map {
 			join(' ', ((ref) ? join(':', @$_) : $_), $self->[DEF_TYPE]->{(ref) ? "@$_" : $_} || ())
 		} @{$self->[DEF]}
-	) && $self->[CSV]->string
+	) && ($self->[TYPE] ? "$self->[TYPE]> " : ''). $self->[CSV]->string
 }
 
 sub set_def {
 	my $self = shift;
 	croak "missing definition" unless @_;
-	my $def = (@_==1 && ref $_[0]) ? $_[0] : \@_;
+	my $type = @_>1 && shift;
+	my $def = shift;
+
+	croak "if type must be a string" if defined($type) && $type =~ /\W/;
+	croak "definition must be an array reference" unless (ref($def)||'') eq 'ARRAY';
 	
+	$self->[TYPE] = $type;
 	$self->[DEF] = [];
 	$self->[DEF_TYPE] = {};
 	
