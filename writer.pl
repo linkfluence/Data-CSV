@@ -9,7 +9,7 @@ my $writer = Data::CSV::Writer->new(
 	check_type	=> 1,
 );
 
-$writer->def(
+$writer->def({
 	node => [
 		a		=> 'INTEGER',
 		b		=> undef,
@@ -24,7 +24,7 @@ $writer->def(
 			b	=> 'VARCHAR',
 		},
 	]
-);
+});
 
 print $writer->def;
 print $writer->row({
@@ -40,7 +40,7 @@ print "\n\n";
 
 print $writer->all(
 	 # first entry must be the definition
-	node => [
+	{node => [
 		a		=> 'INTEGER',
 		b		=> undef,
 		test	=> [
@@ -53,7 +53,7 @@ print $writer->all(
 			a	=> undef,
 			b	=> 'VARCHAR',
 		},
-	],
+	]},
 	{
 		a		=> '0',
 		test	=> {

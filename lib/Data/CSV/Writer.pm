@@ -13,7 +13,7 @@ sub liner {
 	delete $self->[TYPE];
 	delete $self->[DEF];
 	sub {
-		print $fh $self->row(shift)
+		print $fh $self->row(@_)
 	}
 }
 
@@ -22,8 +22,6 @@ sub row {
 	
 	#croak "no column definition" unless $self->[DEF];
 	return $self->def($hash) unless $self->[DEF];
-	
-	$hash = {@$hash} if ref($hash) eq 'ARRAY';
 	
 	my $h;
 	my @row = map {
@@ -49,15 +47,6 @@ sub row {
 	$self->[CSV]->combine(@row) && $self->[CSV]->string
 }
 
-sub all {
-	my $self = shift;
-	delete $self->[TYPE];
-	delete $self->[DEF];
-	return unless @_;
-	(ref($_[0]) ? () : $self->def(splice(@_, 0, 2))), map {$self->row($_)} @_
-	
-}
-
 sub get_def {
 	my $self = shift;
 	
@@ -73,10 +62,9 @@ sub get_def {
 sub set_def {
 	my $self = shift;
 	croak "missing definition" unless @_;
-	my $type = @_>1 && shift;
-	my $def = shift;
+	my ($type, $def) = (ref($_[0]) eq 'HASH') ? %{$_[0]} : (undef, $_[0]);
 
-	croak "if type must be a string" if defined($type) && $type =~ /\W/;
+	croak "if type is present it must be a string" if defined($type) && $type =~ /\W/;
 	croak "definition must be an array reference" unless (ref($def)||'') eq 'ARRAY';
 	
 	$self->[TYPE] = $type;
