@@ -60,7 +60,7 @@ sub get_def {
 	for (@{$self->[DEF]}) {
 		if (ref) {
 			my $h = $self->[DEF_TYPE]->{(ref) ? "@$_" : $_};
-			$h = {$_ => $h} for reverse @$_[1..$#$_];
+			$h = [$_ => $h] for reverse @$_[1..$#$_];
 			push @$array, $_->[0], $h
 		}
 		else {

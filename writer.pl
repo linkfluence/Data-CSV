@@ -14,15 +14,13 @@ $writer->def({
 		a		=> 'INTEGER',
 		b		=> undef,
 		test	=> [
-			# array => preserve order
 			b	=> undef,
 			a	=> 'VARCHAR',
 		],
-		test2	=> {
-			# hash => order is lost
+		test2	=> [
 			a	=> undef,
 			b	=> 'VARCHAR',
-		},
+		],
 	]
 });
 
@@ -44,15 +42,13 @@ print $writer->all(
 		a		=> 'INTEGER',
 		b		=> undef,
 		test	=> [
-			# array => preserve order
 			b	=> undef,
 			a	=> 'VARCHAR',
 		],
-		test2	=> {
-			# hash => order is lost
+		test2	=> [
 			a	=> undef,
 			b	=> 'VARCHAR',
-		},
+		],
 	]},
 	{
 		a		=> '0',

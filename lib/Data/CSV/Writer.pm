@@ -56,7 +56,7 @@ sub get_def {
 		map {
 			join(' ', ((ref) ? join(':', @$_) : $_), $self->[DEF_TYPE]->{(ref) ? "@$_" : $_} || ())
 		} @{$self->[DEF]}
-	) && ($self->[TYPE] ? "$self->[TYPE]> " : ''). $self->[CSV]->string
+	) && ($self->[TYPE] ? "$self->[TYPE]def> " : ''). $self->[CSV]->string
 }
 
 sub set_def {
@@ -85,7 +85,7 @@ sub _traverse {
 	if (ref $el) {
 		mapp {
 			_traverse($b, $store, @path, $a);
-		} ref($el) eq 'HASH' ? %$el : @$el;
+		} @$el;
 	}
 	else {
 		push @$store, [@path, $el];
