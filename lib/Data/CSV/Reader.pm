@@ -85,7 +85,9 @@ sub set_def {
 	$self->[TYPE] = $1;
 
 	$self->[DEF] = [ map { /:/ ? [split(':', $_)] : $_ } @$row ];
+	
 	for (@{$self->[DEF]}) {
+		s/^\s+|\s+$//g for (ref) ? @$_ : $_;
 		if (((ref) ? $_->[-1] : $_) =~  s/\s+([A-Z]+)//) {
 			$self->[DEF_TYPE]->{(ref) ? "@$_" : $_} = $1
 		}
