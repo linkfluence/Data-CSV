@@ -27,15 +27,23 @@ sub row {
 			$h = $hash;
 			$h = $h->{$_} for @$_;
 			if (my $type = $self->[CHECK_TYPE] && $self->[DEF_TYPE]->{"@$_"}) {
-				if ($type eq 'INTEGER') {
-					$h =~ /\D/ && croak "'$h' is not of type INTEGER in column ", join(':', $_);
+				if (
+					($type eq 'INTEGER' && $h =~ /\D/)
+					||
+					($type eq 'FLOAT' && $h =~ /[^\d\.]/)
+				) {
+					croak "'$h' is not of type $type in column ", join(':', @$_);
 				}
 			}
 		} else {
 			$h = $hash->{$_};
 			if (my $type = $self->[CHECK_TYPE] && $self->[DEF_TYPE]->{$_}) {
-				if ($type eq 'INTEGER') {
-					$h =~ /\D/ && croak "'$h' is not of type INTEGER in column $_";
+				if (
+					($type eq 'INTEGER' && $h =~ /\D/)
+					||
+					($type eq 'FLOAT' && $h =~ /[^\d\.]/)
+				) {
+					croak "'$h' is not of type $type in column $_";
 				}
 			}
 		}

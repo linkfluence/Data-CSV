@@ -33,8 +33,12 @@ sub row {
 		if (ref) {
 			my $h = $row->[++$i];
 			if (my $type = $self->[CHECK_TYPE] && $self->[DEF_TYPE]->{"@$_"}) {
-				if ($type eq 'INTEGER') {
-					$h =~ /\D/ && croak "'$h' is not of type INTEGER in column ", join(':', @$_);
+				if (
+					($type eq 'INTEGER' && $h =~ /\D/)
+					||
+					($type eq 'FLOAT' && $h =~ /[^\d\.]/)
+				) {
+					croak "'$h' is not of type $type in column ", join(':', @$_);
 				}
 			}
 			$h = {$_ => $h} for reverse @$_[1..$#$_];
@@ -42,8 +46,12 @@ sub row {
 		} else {
 			$hash->{$_} = $row->[++$i];
 			if (my $type = $self->[CHECK_TYPE] && $self->[DEF_TYPE]->{$_}) {
-				if ($type eq 'INTEGER') {
-					$row->[$i] =~ /\D/ && croak "'$row->[$i]' is not of type INTEGER in column $_";
+				if (
+					($type eq 'INTEGER' && $row->[$i] =~ /\D/)
+					||
+					($type eq 'FLOAT' && $row->[$i] =~ /[^\d\.]/)
+				) {
+					croak "'$row->[$i]' is not of type $type in column $_";
 				}
 			}
 		}
@@ -88,7 +96,7 @@ sub set_def {
 	
 	for (@{$self->[DEF]}) {
 		s/^\s+|\s+$//g for (ref) ? @$_ : $_;
-		if (((ref) ? $_->[-1] : $_) =~  s/\s+([A-Z]+)//) {
+		if (((ref) ? $_->[-1] : $_) =~  s/\s+([A-Z]+(?:\(\d*\))?)$//) {
 			$self->[DEF_TYPE]->{(ref) ? "@$_" : $_} = $1
 		}
 	}

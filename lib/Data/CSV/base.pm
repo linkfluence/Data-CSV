@@ -81,4 +81,8 @@ sub text_csv {
 	$_[0]->[CSV]
 }
 
+sub type {
+	$_[0]->[TYPE]
+}
+
 1
