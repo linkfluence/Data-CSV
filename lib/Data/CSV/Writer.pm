@@ -19,8 +19,6 @@ sub liner {
 
 sub row {
 	my ($self, $hash) = @_;
-	
-	#croak "no column definition" unless $self->[DEF];
 	return $self->def($hash) unless $self->[DEF];
 	
 	my $h;
@@ -49,7 +47,6 @@ sub row {
 
 sub get_def {
 	my $self = shift;
-	
 	croak "no column definition" unless $self->[DEF];
 	
 	$self->[CSV]->combine(

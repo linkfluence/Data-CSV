@@ -12,25 +12,26 @@ sub liner {
 	delete $self->[TYPE];
 	delete $self->[DEF];
 	sub {{
-		my $line = <$fh> || return;
-		redo unless $line =~ /\S/;
-		$self->row($line)
+		my $row = $self->[CSV]->getline($fh) || return;
+		redo if @$row==1 && $row->[0] eq '';
+		$self->row($row)
 	}}
 }
 
 sub row {
-	my ($self, $line) = @_;
+	my ($self, $row) = @_;
+	return $self->def($row) unless $self->[DEF];
 	
-	#croak "no column definition" unless $self->[DEF];
-	return $self->def($line) unless $self->[DEF];
-
-	my @row = $self->[CSV]->parse($line) && $self->[CSV]->fields;
+	unless (ref $row) {
+		$self->[CSV]->parse($row) or croak "unable to parse row";
+		$row = [$self->[CSV]->fields];
+	}
 
 	my $hash = {};
 	my $i = -1;
 	for (@{$self->[DEF]}) {
 		if (ref) {
-			my $h = $row[++$i];
+			my $h = $row->[++$i];
 			if (my $type = $self->[CHECK_TYPE] && $self->[DEF_TYPE]->{"@$_"}) {
 				if ($type eq 'INTEGER') {
 					$h =~ /\D/ && croak "'$h' is not of type INTEGER in column ", join(':', @$_);
@@ -39,10 +40,10 @@ sub row {
 			$h = {$_ => $h} for reverse @$_[1..$#$_];
 			$hash->{$_->[0]} = $h
 		} else {
-			$hash->{$_} = $row[++$i];
+			$hash->{$_} = $row->[++$i];
 			if (my $type = $self->[CHECK_TYPE] && $self->[DEF_TYPE]->{$_}) {
 				if ($type eq 'INTEGER') {
-					$row[$i] =~ /\D/ && croak "'$row[$i]' is not of type INTEGER in column $_";
+					$row->[$i] =~ /\D/ && croak "'$row->[$i]' is not of type INTEGER in column $_";
 				}
 			}
 		}
@@ -53,7 +54,6 @@ sub row {
 
 sub get_def {
 	my $self = shift;
-	
 	croak "no column definition" unless $self->[DEF];
 	
 	my $array;
@@ -74,13 +74,17 @@ sub get_def {
 
 sub set_def {
 	my $self = shift;
-	my $line = shift || croak "missing definition";
+	my $row = shift || croak "missing definition";
 	
-	$line =~ s/^(\w+?)def>\s*//;
+	unless (ref $row) {
+		$self->[CSV]->parse($row) or croak "unable to parse column definition";
+		$row = [$self->[CSV]->fields];
+	}
+
+	$row->[0] =~ s/^(\w+?)def>\s*//;
 	$self->[TYPE] = $1;
-	
-	my @row = $self->[CSV]->parse($line) && $self->[CSV]->fields or croak "unable to parse column definition";
-	$self->[DEF] = [ map { /:/ ? [split(':', $_)] : $_ } @row ];
+
+	$self->[DEF] = [ map { /:/ ? [split(':', $_)] : $_ } @$row ];
 	for (@{$self->[DEF]}) {
 		if (((ref) ? $_->[-1] : $_) =~  s/\s+([A-Z]+)//) {
 			$self->[DEF_TYPE]->{(ref) ? "@$_" : $_} = $1
