@@ -28,7 +28,7 @@ print $writer->def;
 print $writer->row({
 	a		=> '0',
 	test	=> {
-		a => 6
+		a => '6 rf'
 	},
 });
 
