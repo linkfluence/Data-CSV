@@ -56,12 +56,16 @@ sub row {
 sub get_def {
 	my $self = shift;
 	croak "no column definition" unless $self->[DEF];
-	
+	my $col;
 	$self->[CSV]->combine(
 		map {
-			join(' ', ((ref) ? join(':', @$_) : $_), $self->[DEF_TYPE]->{(ref) ? "@$_" : $_} || ())
+			join(' ',
+				($self->[TYPE] && ++$col==1 ? "$self->[TYPE]def>" : ()),
+				((ref) ? join(':', @$_) : $_),
+				$self->[DEF_TYPE]->{(ref) ? "@$_" : $_} || ()
+			)
 		} @{$self->[DEF]}
-	) && ($self->[TYPE] ? "$self->[TYPE]def> " : ''). $self->[CSV]->string
+	) && $self->[CSV]->string
 }
 
 sub set_def {
