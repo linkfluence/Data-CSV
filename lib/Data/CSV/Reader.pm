@@ -2,6 +2,7 @@ package Data::CSV::Reader;
 use strict;
 use warnings;
 use Carp;
+use Hash::Merge qw(merge);
 use base 'Data::CSV::base';
 use enum::fields::extending 'Data::CSV::base';
 
@@ -42,7 +43,12 @@ sub row {
 				}
 			}
 			$h = {$_ => $h} for reverse @$_[1..$#$_];
-			$hash->{$_->[0]} = $h
+	
+			if ($hash->{$_->[0]}) {
+				$hash->{$_->[0]} = merge($hash->{$_->[0]}, $h)
+			} else {
+				$hash->{$_->[0]} = $h
+			}
 		} else {
 			$hash->{$_} = $row->[++$i];
 			if (my $type = $self->[CHECK_TYPE] && $self->[DEF_TYPE]->{$_}) {
