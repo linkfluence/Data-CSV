@@ -99,7 +99,7 @@ sub _traverse {
 	if (ref $el) {
 		mapp {
 			_traverse($b, $store, @path, $a);
-		} @$el;
+		} ref($el) eq 'HASH' ? %$el : @$el;
 	}
 	else {
 		push @$store, [@path, $el];
