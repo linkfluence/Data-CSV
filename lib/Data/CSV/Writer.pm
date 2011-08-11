@@ -9,6 +9,7 @@ use List::Pairwise qw(mapp);
 sub liner {
 	my ($self, $file) = @_;
 	open(my $fh, '>', $file) or croak "failed to open file '$file' for writing: $!";
+	select((select($fh, $|=1)[0]);
 	binmode $fh;
 	delete $self->[TYPE];
 	delete $self->[DEF];
