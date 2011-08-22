@@ -3,13 +3,19 @@ use strict;
 use warnings;
 use Carp;
 use Hash::Merge qw(merge);
+eval { use File::HTTP qw(open) };
 use base 'Data::CSV::base';
 use enum::fields::extending 'Data::CSV::base';
 
 sub liner {
 	my ($self, $file) = @_;
-	open(my $fh, '<', $file) or croak "failed to open file '$file' for reading: $!";
-	binmode $fh;
+	my $fh; 
+	if (ref $file) {
+		$fh = $file
+	} else {
+		open($fh, '<', $file) or croak "failed to open file '$file' for reading: $!";
+		binmode $fh;
+	}
 	delete $self->[TYPE];
 	delete $self->[DEF];
 	sub {{
