@@ -9,21 +9,32 @@ my $writer = Data::CSV::Writer->new(
 	check_type	=> 1,
 );
 
+#$writer->def({
+#	node => [
+#		a		=> 'INTEGER',
+#		b		=> undef,
+#		test	=> [
+#			b	=> undef,
+#			a	=> 'VARCHAR',
+#		],
+#		test2	=> [
+#			a	=> undef,
+#			b	=> 'VARCHAR',
+#		],
+#	]
+#}#);
+
 $writer->def({
-	node => [
+	node	=> [
 		a		=> 'INTEGER',
 		b		=> undef,
-		test	=> [
-			b	=> undef,
-			a	=> 'VARCHAR',
-		],
-		test2	=> [
-			a	=> undef,
-			b	=> 'VARCHAR',
-		],
+		'test:b'	=> undef,
+		'test:a'	=> 'VARCHAE',
+		'test2:a'	=> undef,
+		'test2:b'	=> 'VARCHAR',
 	]
 });
-
+		
 print $writer->def;
 print $writer->row({
 	a		=> '0',
@@ -38,17 +49,25 @@ print "\n\n";
 
 print $writer->all(
 	 # first entry must be the definition
-	{node => [
+	#{node => [
+	#	a		=> 'INTEGER',
+	#	b		=> undef,
+	#	test	=> [
+	#		b	=> undef,
+	#		a	=> 'VARCHAR',
+	#	],
+	#	test2	=> [
+	#		a	=> undef,
+	#		b	=> 'VARCHAR',
+	#	],
+	#]},
+	{node	=> [
 		a		=> 'INTEGER',
 		b		=> undef,
-		test	=> [
-			b	=> undef,
-			a	=> 'VARCHAR',
-		],
-		test2	=> [
-			a	=> undef,
-			b	=> 'VARCHAR',
-		],
+		'test:b'	=> undef,
+		'test:a'	=> 'VARCHAE',
+		'test2:a'	=> undef,
+		'test2:b'	=> 'VARCHAR',
 	]},
 	{
 		a		=> '0',

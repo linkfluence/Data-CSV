@@ -33,7 +33,7 @@ sub row {
 		$self->[CSV]->parse($row) or croak "unable to parse row";
 		$row = [$self->[CSV]->fields];
 	}
-
+	local $" = ':';
 	my $hash = {};
 	my $i = -1;
 	for (@{$self->[DEF]}) {
@@ -45,7 +45,7 @@ sub row {
 					||
 					($type eq 'FLOAT' && $h =~ /[^\d\.]/)
 				) {
-					croak "'$h' is not of type $type in column ", join(':', @$_);
+					croak "'$h' is not of type $type in column '@$_'";
 				}
 			}
 			$h = {$_ => $h} for reverse @$_[1..$#$_];
@@ -63,7 +63,7 @@ sub row {
 					||
 					($type eq 'FLOAT' && $row->[$i] =~ /[^\d\.]/)
 				) {
-					croak "'$row->[$i]' is not of type $type in column $_";
+					croak "'$row->[$i]' is not of type $type in column '$_'";
 				}
 			}
 		}
@@ -75,20 +75,16 @@ sub row {
 sub get_def {
 	my $self = shift;
 	croak "no column definition" unless $self->[DEF];
-	
-	my $array;
-	
-	for (@{$self->[DEF]}) {
-		if (ref) {
-			my $h = $self->[DEF_TYPE]->{(ref) ? "@$_" : $_};
-			$h = [$_ => $h] for reverse @$_[1..$#$_];
-			push @$array, $_->[0], $h
-		}
-		else {
-			push @$array, $_, $self->[DEF_TYPE]->{(ref) ? "@$_" : $_}
-		}
-	}
-	
+	local $" = ':';
+	my $array = [
+		map {
+			(ref)
+			?
+			("@$_", $self->[DEF_TYPE]->{"@$_"})
+			:
+			($_, $self->[DEF_TYPE]->{$_})
+		} @{$self->[DEF]}
+	];
 	$self->[TYPE] ? { $self->[TYPE] => $array } : $array
 }
 
@@ -105,7 +101,7 @@ sub set_def {
 	$self->[TYPE] = $1;
 
 	$self->[DEF] = [ map { /:/ ? [split(':', $_)] : $_ } @$row ];
-	
+	local $" = ':';
 	for (@{$self->[DEF]}) {
 		s/^\s+|\s+$//g for (ref) ? @$_ : $_;
 		if (((ref) ? $_->[-1] : $_) =~  s/\s+([A-Z]+(?:\(\d*\))?)$//) {

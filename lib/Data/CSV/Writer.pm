@@ -21,7 +21,7 @@ sub liner {
 sub row {
 	my ($self, $hash) = @_;
 	return $self->def($hash) unless $self->[DEF];
-	
+	local $" = ':';
 	my $h;
 	my @row = map {
 		if (ref) {
@@ -33,7 +33,7 @@ sub row {
 					||
 					($type eq 'FLOAT' && $h =~ /[^\d\.]/)
 				) {
-					croak "'$h' is not of type $type in column ", join(':', @$_);
+					croak "'$h' is not of type $type in column '@$_'";
 				}
 			}
 		} else {
@@ -44,7 +44,7 @@ sub row {
 					||
 					($type eq 'FLOAT' && $h =~ /[^\d\.]/)
 				) {
-					croak "'$h' is not of type $type in column $_";
+					croak "'$h' is not of type $type in column '$_'";
 				}
 			}
 		}
@@ -61,11 +61,15 @@ sub get_def {
 	my $quote = $self->[TYPE] && $self->[CSV]->quote_char();
 	$self->[CSV]->quote_char('') if $quote;
 
+	local $" = ':';
 	$self->[CSV]->combine(
 		map {
 			join(' ',
-				((ref) ? join(':', @$_) : $_),
-				$self->[DEF_TYPE]->{(ref) ? "@$_" : $_} || ()
+				(ref)
+				?
+				("@$_", ($self->[DEF_TYPE]->{"@$_"}) || ())
+				:
+				($_, ($self->[DEF_TYPE]->{$_}) || ())
 			)
 		} @{$self->[DEF]}
 	);
@@ -83,27 +87,15 @@ sub set_def {
 	croak "definition must be an array reference" unless (ref($def)||'') eq 'ARRAY';
 	
 	$self->[TYPE] = $type;
-	$self->[DEF] = [];
 	$self->[DEF_TYPE] = {};
+	$self->[DEF] = [mapp {
+		[split(/:/, $a), $b]
+	} @$def];
 	
-	_traverse($def => $self->[DEF]);
-	
+	local $" = ':';
 	for (@{$self->[DEF]}) {
 		$self->[DEF_TYPE]->{(ref) ? "@$_" : $_} = pop @$_;
 		$_ = $_->[0] if @$_ == 1
-	}
-}
-
-sub _traverse {
-	my ($el, $store, @path) = @_;
-	
-	if (ref $el) {
-		mapp {
-			_traverse($b, $store, @path, $a);
-		} ref($el) eq 'HASH' ? %$el : @$el;
-	}
-	else {
-		push @$store, [@path, $el];
 	}
 }
 
