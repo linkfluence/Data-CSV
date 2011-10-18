@@ -12,8 +12,8 @@ use enum::fields qw(
 );
 
 use constant DEFAULT_TEXT_CSV_ARGS	=> (
-	#sep_char	=> ";", 
-	#quote_char	=> '"',
+	sep_char	=> ";", 
+	quote_char	=> '"',
 	binary		=> 1,
 	eol			=> "\n",
 );
@@ -40,12 +40,12 @@ sub new {
 	$self->[CSV] = do {
 		if (!$text_csv) {
 			require Text::CSV;
-			Text::CSV->new({DEFAULT_TEXT_CSV_ARGS}) or die "invalid DEFAULT_TEXT_CSV_ARGS"
+			Text::CSV->new({$class->DEFAULT_TEXT_CSV_ARGS}) or die "invalid DEFAULT_TEXT_CSV_ARGS"
 		}
 		elsif (ref($text_csv) eq 'HASH') {
 			require Text::CSV;
 			Text::CSV->new({
-				DEFAULT_TEXT_CSV_ARGS,
+				$class->DEFAULT_TEXT_CSV_ARGS,
 				%$text_csv
 			}) or croak "invalid arguments in 'text_csv'. Check your arguments: '", join("', '", sort keys %$text_csv), "'";
 		}
