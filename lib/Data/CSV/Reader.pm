@@ -33,6 +33,7 @@ sub row {
 		$self->[CSV]->parse($row) or croak "unable to parse row";
 		$row = [$self->[CSV]->fields];
 	}
+	$row->[-1] =~ s/\r$//;
 	local $" = ':';
 	my $hash = {};
 	my $i = -1;
