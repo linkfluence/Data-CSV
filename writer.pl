@@ -7,6 +7,12 @@ use Data::CSV::Writer;
 
 my $writer = Data::CSV::Writer->new(
 	check_type	=> 1,
+	text_csv => {
+		sep_char	=> ",", 
+		quote_char	=> "'",
+		binary		=> 1,
+		eol		=> "\n",
+	}
 );
 
 #$writer->def({
@@ -39,7 +45,7 @@ print $writer->def;
 print $writer->row({
 	a		=> '0',
 	test	=> {
-		a => '6 rf'
+		a => "http://l'express.fr/"
 	},
 });
 

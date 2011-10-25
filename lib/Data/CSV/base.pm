@@ -39,12 +39,12 @@ sub new {
 	
 	$self->[CSV] = do {
 		if (!$text_csv) {
-			require Text::CSV;
-			Text::CSV->new({$class->DEFAULT_TEXT_CSV_ARGS}) or die "invalid DEFAULT_TEXT_CSV_ARGS"
+			require Text::CSV_PP;
+			Text::CSV_PP->new({$class->DEFAULT_TEXT_CSV_ARGS}) or die "invalid DEFAULT_TEXT_CSV_ARGS"
 		}
 		elsif (ref($text_csv) eq 'HASH') {
-			require Text::CSV;
-			Text::CSV->new({
+			require Text::CSV_PP;
+			Text::CSV_PP->new({
 				$class->DEFAULT_TEXT_CSV_ARGS,
 				%$text_csv
 			}) or croak "invalid arguments in 'text_csv'. Check your arguments: '", join("', '", sort keys %$text_csv), "'";
