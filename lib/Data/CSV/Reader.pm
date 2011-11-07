@@ -19,7 +19,12 @@ sub liner {
 	delete $self->[TYPE];
 	delete $self->[DEF];
 	sub {{
-		my $row = $self->[CSV]->getline($fh) or $self->[CSV]->eof ? return : redo;
+		my $row = $self->[CSV]->getline($fh);
+		if (!$row) {
+			return if $self->[CSV]->eof;
+			warnings::warnif(misc => $self->[CSV]->error_diag);
+			redo
+		}
 		redo if @$row==1 && $row->[0] eq '';
 		$self->row($row)
 	}}
