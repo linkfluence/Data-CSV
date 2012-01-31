@@ -22,7 +22,7 @@ sub liner {
 		my $row = $self->[CSV]->getline($fh);
 		if (!$row) {
 			return if $self->[CSV]->eof;
-			warnings::warnif(misc => sprintf("%s parsing error: %s", ref($self->[CSV]), $self->[CSV]->error_diag || 'unkown error')); # $self->[CSV]->error_diag must be in scalar context
+			$self->parsing_error;
 			redo
 		}
 		redo if @$row==1 && $row->[0] eq '';

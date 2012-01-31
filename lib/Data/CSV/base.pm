@@ -9,13 +9,15 @@ use enum::fields qw(
 	CHECK_TYPE
 	CSV
 	TYPE
+	STRICT
 );
 
 use constant DEFAULT_TEXT_CSV_ARGS	=> (
-	sep_char	=> ";", 
-	quote_char	=> '"',
-	binary		=> 1,
-	eol			=> "\n",
+	sep_char    => ";", 
+	quote_char  => '"',
+	escape_char => '"',
+	binary      => 1,
+	eol         => "\n",
 );
 
 #use constant KNOWN_TYPES	=> qw(INTEGER FLOAT VARCHAR TEXT);
@@ -26,12 +28,14 @@ sub new {
 		text_csv	=> undef,
 		check_type	=> 0,
 		def			=> undef,
+		strict		=> 0,
 		@_
 	);
 	
-	my $text_csv = delete($args{text_csv});
-	my $check_type = delete($args{check_type});
-	my $def = delete($args{def});
+	my $text_csv = delete $args{text_csv};
+	my $check_type = delete $args{check_type};
+	my $def = delete $args{def};
+	my $strict = delete $args{strict};
 	
 	%args && croak "invalid arguments: '", join("', '", sort keys %args), "'";
 	
@@ -58,10 +62,22 @@ sub new {
 	};
 	
 	$self->[CHECK_TYPE] = $check_type;
+	$self->[STRICT] = $strict;
 
 	$self->set_def($def) if $def;
 
 	$self
+}
+
+sub parsing_error {
+	my $self = shift;
+	my $msg = sprintf("%s parsing error: %s", ref($self->[CSV]), $self->[CSV]->error_diag || 'unkown error');
+	# $self->[CSV]->error_diag must be in scalar context
+	if ($self->[STRICT]) {
+		croak "$msg\nFatal error when strict mode enabled"
+	} else {
+		warnings::warnif(misc => $msg);
+	}
 }
 
 sub def {
